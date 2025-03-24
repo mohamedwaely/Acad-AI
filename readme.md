@@ -53,7 +53,7 @@ Anyone can chat with the AI about projects through RAG, and only admins can uplo
 | `/v1/token` | POST | Login (JWT token generation) | No |
 | `/v1/add-admin` | POST | Add new admin | Admin (Degree A) |
 | `/v1/upload-projects` | POST | Upload new project | Admin |
-| `/v1/chat` | POST | AI chat about projects | User/Admin |
+| `/v1/chat` | POST | AI chat about projects | No |
 
 ## Setup
 1. Install requirements: `pip install -r requirements.txt`
