@@ -22,7 +22,7 @@ Anyone can chat with the AI about projects through RAG, and only admins can uplo
 
 - **AI Chat System**
   - Context-aware responses about projects
-  - Azure AI integration for intelligent Q&A
+  - Together AI integration for intelligent Q&A
   - Project recommendations based on queries
 
 ## Built With
