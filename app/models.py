@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean, Text
+from sqlalchemy import Column, Integer, String, Boolean, Text, Float
 from pgvector.sqlalchemy import Vector
 from app.db import Base
+metadata=Base.metadata
+print('MetaDAta:', metadata,'\n')
 
 class User(Base):
     __tablename__ = "users"
@@ -32,4 +34,15 @@ class Project(Base):
     supervisor = Column(String(100), nullable=False)
     year = Column(Integer, nullable=False)
     embedding = Column(Vector(768), nullable=False) 
+
+class PreProjects(Base):
+    __tablename__ = "preprojects"
+
+    id= Column(Integer, primary_key=True)
+    title= Column(String(100), unique=True, nullable=False)
+    description= Column(Text, nullable=False)
+    year= Column(Integer, nullable=False)
+    maxSimScore= Column(Float, nullable=True)
+
+
 
