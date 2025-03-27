@@ -7,6 +7,7 @@ from app.db import get_db
 from app.models import User, Admin
 import os
 from chat.generate_response import llm_response
+from controllers.check_similarity import check_similarity
 
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
@@ -150,4 +151,6 @@ async def chat(query: schemas.ChatRequest, db: Session = Depends(get_db)):
 
     # return {"response": response}
 
-
+@router.post("/v1/check-similarity")
+async def check_proj_similarity(project: schemas.checkProject, db: Session = Depends(get_db)):
+    return check_similarity(project, db)
