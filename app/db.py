@@ -6,7 +6,8 @@ import os
 load_dotenv()
 
 db_password = os.getenv('dbpass') 
-dbURL = f"postgresql+psycopg://postgres:db_password@localhost:5432/projdata"
+# dbURL = f"postgresql+psycopg://postgres:db_password@localhost:5432/projdata"
+dbURL = f"postgresql+psycopg://postgres:Mwy21@localhost:5432/projdata"
 
 engine = create_engine(dbURL)
 

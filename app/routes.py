@@ -122,6 +122,58 @@ async def add_admin(admin_data: schemas.Admin, cur_admin: schemas.AdminDB = Depe
     db.refresh(new_admin)
     return new_admin
 
+from typing import Optional
+@router.get("/v1/admins/{degree}", response_model=list[schemas.AdminResponse])
+@router.get("/v1/admins/", response_model=list[schemas.AdminResponse])
+async def get_admins(degree: Optional[str] = None, cur_admin: schemas.AdminDB = Depends(auth.getCurrentAdmin), db: Session = Depends(get_db)):
+    # Check if the current admin has degree 'A'
+    if cur_admin.degree != 'A':
+        raise HTTPException(status_code=403, detail="Only admins with degree A can view other admins")
+    try: 
+        query = db.query(
+            models.Admin.id,
+            models.Admin.username,
+            models.Admin.email,
+            models.Admin.degree,
+            models.Admin.added_by
+        )
+        if degree is None:
+            admins=query.all()
+        else:
+            admins=query.filter(models.Admin.degree == degree).all()
+
+        return admins
+    except Exception as e:
+        print(str(e))
+        raise HTTPException(status_code=500, detail=f"Failed to get admins: {str(e)}")
+
+@router.get("/v1/projects/{title}", response_model=schemas.ProjectsResponse)
+@router.get("/v1/projects", response_model=list[schemas.ProjectsResponse])
+async def get_projects(title: Optional[str] = None, db: Session = Depends(get_db)):
+    try:
+        query = db.query(
+            models.Project.id,
+            models.Project.title,
+            models.Project.description,
+            models.Project.tools,
+            models.Project.supervisor,
+            models.Project.year
+        )
+
+        if title is None:
+            # Return all projects
+            projects = query.all()
+            return projects
+        else:
+            # Return a single project by title
+            project = query.filter(models.Project.title == title).first()
+            if project is None:
+                raise HTTPException(status_code=404, detail=f"Project with title '{title}' not found")
+            return project
+
+    except Exception as e:
+        print(str(e))
+        raise HTTPException(status_code=500, detail=f"Failed to get projects: {str(e)}")
 
 # @router.post("/v1/chat", response_model=schemas.ChatResponse)
 @router.post("/v1/chat", response_class=StreamingResponse)
@@ -154,3 +206,5 @@ async def chat(query: schemas.ChatRequest, db: Session = Depends(get_db)):
 @router.post("/v1/check-similarity")
 async def check_proj_similarity(project: schemas.checkProject, db: Session = Depends(get_db)):
     return check_similarity(project, db)
+
+

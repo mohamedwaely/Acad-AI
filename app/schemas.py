@@ -110,5 +110,20 @@ class checkProject(BaseModel):
     title: str
     description: str
 
-
-
+class AdminResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    degree: str
+    added_by: str
+    class Config:
+        from_attributes = True
+class ProjectsResponse(BaseModel):
+    id: int
+    title: str
+    supervisor: str
+    description: str
+    tools: str
+    year: int
+    class Config:   
+        from_attributes = True
