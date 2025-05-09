@@ -12,3 +12,4 @@ def calculate_similarity(project, projects: list):
     all_similarities = [(i, score) for i, score in enumerate(similarity_matrix[0])]
 
     return all_similarities
+

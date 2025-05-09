@@ -45,4 +45,3 @@ class PreProjects(Base):
     maxSimScore= Column(Float, nullable=True)
 
 
-
