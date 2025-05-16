@@ -13,3 +13,8 @@ scikit-learn
 together
 pydantic
 typing-extensions
+uv
+
+prometheus-client
+fastapi-health
+starlette-exporter

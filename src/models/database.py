@@ -5,8 +5,13 @@ import os
 
 load_dotenv()
 
-db_password = os.getenv('dbpass') 
-dbURL = f"postgresql+psycopg://postgres:db_password@localhost:5432/projdata"
+db_user = os.getenv('db_user', 'postgres')
+db_password = os.getenv('db_password')
+db_host = os.getenv('db_host', 'localhost')
+db_port = os.getenv('db_port', '5432')
+db_name = os.getenv('db_name', 'projdata')
+
+dbURL = f"postgresql+psycopg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 
 
 engine = create_engine(dbURL)

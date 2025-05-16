@@ -1,19 +1,12 @@
-from app.models import User
-from azure.ai.inference import ChatCompletionsClient
-from azure.core.credentials import AzureKeyCredential
+from models.entities import Project
+from together import AsyncTogether
 from dotenv import load_dotenv
 import os
-from together import AsyncTogether
+from fastapi import HTTPException
+
 load_dotenv()
 
-# client = ChatCompletionsClient(
-#     endpoint=os.getenv("endpoint"),
-#     credential=AzureKeyCredential(os.getenv("token")),
-# )
-
-client = AsyncTogether(
-    api_key=os.getenv("togetherAPI")
-)
+client = AsyncTogether(api_key=os.getenv("togetherAPI"))
 
 system_prompt = """
 You are a helpful assistant that provides information about graduation projects. Follow these steps for every user question:
@@ -32,48 +25,37 @@ Guidelines:
 - If the question started with welcoming words, respond with a welcoming message and then provide the response.
 """
 
-
-from fastapi import HTTPException
-async def llm_response(query: str, projects: list) -> str:
+async def llm_response(query: str, projects: list[Project]) -> str:
     try:
         if not query:
             raise HTTPException(status_code=400, detail="Query cannot be empty")
         if not projects:
             raise HTTPException(status_code=400, detail="No projects provided")
-
+        
         context = "\n".join(
             f"- title: {proj.title}, description: {proj.description}, "
             f"supervisor: {proj.supervisor}, tools: {proj.tools}, "
             f"Year: {proj.year}"
             for proj in projects
         )
-
+        
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"Question: {query}\nContext: {context}"}
         ]
-
-        # response = client.complete(
-        #     messages=messages,
-        #     model=os.getenv("model_name"),
-        # )
-
+        
         stream = await client.chat.completions.create(
             model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
             messages=messages,
             stream=True
         )
-
+        
         async for chunk in stream:
             if chunk.choices[0].delta.content is not None:
                 yield chunk.choices[0].delta.content
-
+        
         yield "[DONE]"
-        # if not response or not response.choices:
-        #     raise HTTPException(status_code=500, detail="No response received from LLM")
-
-        # return response.choices[0].message.content
-
+    
     except HTTPException:
         raise
     except Exception as e:
@@ -81,4 +63,3 @@ async def llm_response(query: str, projects: list) -> str:
             status_code=500,
             detail=f"Internal server error: {str(e)}"
         )
-
