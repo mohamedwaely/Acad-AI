@@ -7,16 +7,49 @@ from routes.auth_routes import router as auth_router
 from routes.project_routes import router as project_router
 from routes.admin_routes import router as admin_router
 from routes.chat_routes import router as chat_router
-from utils.metrics import setup_metrics
+from fastapi.middleware.cors import CORSMiddleware
+import os
 
+app = FastAPI(
+    title="Project Management API",
+    description="FastAPI application for project management and AI chat",
+    version="1.0.0"
+)
 
-app = FastAPI()
+# CORS configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:8080", 
+        "https://*.vercel.app",
+        "https://*.netlify.app",
+        "*"  # Remove this in production
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
 
-#setup prometheus metrics
-setup_metrics(app)
+# Health check first (before DB operations)
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "version": "1.0.0"}
+
+@app.get("/")
+async def root():
+    return {
+        "message": "Project Management API is running!",
+        "version": "1.0.0",
+        "docs": "/docs"
+    }
 
 # Create tables if they don't exist
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+    print("Database tables created successfully")
+except Exception as e:
+    print(f"Database table creation warning: {e}")
 
 # Create vector index for embeddings
 try:
@@ -24,15 +57,16 @@ try:
         connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
         connection.execute(text("CREATE INDEX IF NOT EXISTS projects_embedding_idx ON projects USING hnsw (embedding vector_cosine_ops)"))
         connection.commit()
+        print("Vector extension and index created successfully")
 except Exception as e:
-    print(f"Warning: Could not create vector index. This is expected if running for the first time: {e}")
+    print(f"Vector extension warning: {e}")
 
 # Include routers
-app.include_router(auth_router, prefix="/v1")
-app.include_router(project_router, prefix="/v1")
-app.include_router(admin_router, prefix="/v1")
-app.include_router(chat_router, prefix="/v1")
+app.include_router(auth_router, prefix="/v1", tags=["Authentication"])
+app.include_router(project_router, prefix="/v1", tags=["Projects"])
+app.include_router(admin_router, prefix="/v1", tags=["Admin"])
+app.include_router(chat_router, prefix="/v1", tags=["Chat"])
 
 if __name__ == "__main__":
-    uvicorn.run(app=app, host="127.0.0.1", port=5555)
-
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app=app, host="0.0.0.0", port=port)
