@@ -16,32 +16,32 @@
 # email-validator
 
 
-fastapi==0.115.12
-uvicorn[standard]==0.34.3
-sqlalchemy==2.0.41
-psycopg[binary]==3.2.9
-python-dotenv==1.1.0
-python-jose[cryptography]==3.5.0
-passlib[bcrypt]==1.7.4
-pgvector==0.4.1
-pydantic[email]==2.11.5
-python-multipart==0.0.20
-typing-extensions==4.14.0
-email-validator==2.2.0
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg[binary]
+python-dotenv
+python-jose[cryptography]
+passlib[bcrypt]
+pgvector
+pydantic[email]
+python-multipart
+typing-extensions
+email-validator
 
 # AI/ML dependencies (CPU optimized)
-torch==2.7.1+cpu --extra-index-url https://download.pytorch.org/whl/cpu
-sentence-transformers==4.1.0
-transformers==4.52.4
-langchain-huggingface==0.2.0
-scikit-learn==1.7.0
-together==1.5.11
-huggingface-hub==0.32.4
+sentence-transformers
+transformers
+torch
+langchain-huggingface
+scikit-learn
+together
+huggingface-hub
 
 # Additional dependencies
-numpy==2.3.0
-scipy==1.15.3
-tokenizers==0.21.1
-safetensors==0.5.3
-requests==2.32.4
-tqdm==4.67.1
+numpy
+scipy
+tokenizers
+safetensors
+requests
+tqdm
